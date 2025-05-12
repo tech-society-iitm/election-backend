@@ -161,3 +161,14 @@ exports.updatePassword = async (req, res) => {
     });
   }
 };
+
+// Check authentication status
+exports.checkAuthStatus = (req, res) => {
+  // If this controller is reached, authMiddleware.protect has successfully authenticated the user
+  // req.user is populated by the protect middleware
+  res.status(200).json({
+    status: 'success',
+    isLoggedIn: true,
+    user: req.user // Send user data back
+  });
+};

@@ -30,9 +30,9 @@ if (process.env.NODE_ENV === 'development') {
 
 // Enable CORS - Configure this before rate limiter and routes
 app.use(cors({
-  origin: 'http://localhost:3001', // Allow your frontend origin
+  origin: ['http://localhost:3001', 'http://localhost:3002'], // Allow your frontend origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Specify allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'], // Specify allowed headers
   credentials: true // Allow cookies to be sent with requests
 }));
 
@@ -67,7 +67,7 @@ app.use('/api/elections', electionRoutes);
 app.use('/api/votes', voteRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/grievances', grievanceRoutes);
-app.use('/admin/auth', adminAuthRoutes); // Changed '/api/admin/auth' to '/admin/auth'
+app.use('/admin/auth', adminAuthRoutes); 
 
 // 404 Not Found handler
 app.all('*', (req, res, next) => {

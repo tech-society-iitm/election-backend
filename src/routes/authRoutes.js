@@ -13,4 +13,7 @@ router.patch(
   authController.updatePassword
 );
 
+// Route to check authentication status
+router.get('/status', authMiddleware.protect, authController.checkAuthStatus);
+
 module.exports = router;
