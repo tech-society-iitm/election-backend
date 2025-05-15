@@ -16,4 +16,4 @@ router.patch(
 // Route to check authentication status
 router.get('/status', authMiddleware.protect, authController.checkAuthStatus);
 
-module.exports = router;
+export default router;

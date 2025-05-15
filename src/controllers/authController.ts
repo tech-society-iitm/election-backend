@@ -1,23 +1,23 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const User = require('../models/userModel');
+const User = require("../models/userModel").default;
 
 // Generate JWT token
-const signToken = id => {
+const signToken = (id: any) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
 
 // Generate refresh token
-const signRefreshToken = id => {
+const signRefreshToken = (id: any) => {
   return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN
   });
 };
 
 // Create and send tokens
-const createSendTokens = (user, statusCode, res) => {
+const createSendTokens = (user: { _id: any; password: undefined; }, statusCode: number, res: { status: (arg0: any) => { (): any; new(): any; json: { (arg0: { status: string; token: any; refreshToken: any; data: { user: any; }; }): void; new(): any; }; }; }) => {
   const token = signToken(user._id);
   const refreshToken = signRefreshToken(user._id);
 
@@ -35,7 +35,7 @@ const createSendTokens = (user, statusCode, res) => {
 };
 
 // Register a new user
-exports.signup = async (req, res) => {
+exports.signup = async (req: { body: { name: any; email: any; password: any; studentId: any; role: any; house: any; }; }, res: { status: any; }) => {
   try {
     const newUser = await User.create({
       name: req.body.name,
@@ -47,7 +47,7 @@ exports.signup = async (req, res) => {
     });
 
     createSendTokens(newUser, 201, res);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -56,7 +56,8 @@ exports.signup = async (req, res) => {
 };
 
 // Log in a user
-exports.login = async (req, res) => {
+exports.login = async (req: { body: { email: any; password: any; }; }, res: { status: any; }) => {
+
   try {
     const { email, password } = req.body;
 
@@ -87,7 +88,7 @@ exports.login = async (req, res) => {
 
     // 4) If everything ok, send token to client
     createSendTokens(user, 200, res);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -96,7 +97,7 @@ exports.login = async (req, res) => {
 };
 
 // Refresh access token using refresh token
-exports.refreshToken = async (req, res) => {
+exports.refreshToken = async (req: { body: { refreshToken: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { status: string; message?: string; token?: any; }): void; new(): any; }; }; }) => {
   try {
     const { refreshToken } = req.body;
 
@@ -135,7 +136,7 @@ exports.refreshToken = async (req, res) => {
 };
 
 // Update password
-exports.updatePassword = async (req, res) => {
+exports.updatePassword = async (req: { user: { id: any; }; body: { currentPassword: any; newPassword: any; }; }, res: { status: any; }) => {
   try {
     // 1) Get user from collection
     const user = await User.findById(req.user.id).select('+password');
@@ -154,7 +155,7 @@ exports.updatePassword = async (req, res) => {
 
     // 4) Log user in, send JWT
     createSendTokens(user, 200, res);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -163,7 +164,15 @@ exports.updatePassword = async (req, res) => {
 };
 
 // Check authentication status
-exports.checkAuthStatus = (req, res) => {
+exports.checkAuthStatus = (req: { user: any; }, res: {
+    status: (arg0: number) => {
+      (): any; new(): any; json: {
+        (arg0: {
+          status: string; isLoggedIn: boolean; user: any; // Send user data back
+        }): void; new(): any;
+      };
+    };
+  }) => {
   // If this controller is reached, authMiddleware.protect has successfully authenticated the user
   // req.user is populated by the protect middleware
   res.status(200).json({

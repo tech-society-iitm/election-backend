@@ -1,38 +1,57 @@
-const Grievance = require('../models/grievanceModel');
+import { Request, Response, NextFunction } from 'express';
+import Grievance from '../models/grievanceModel';
+import { IGrievance } from '../../types/interfaces';
+
+// Define interface for authenticated requests
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    role: string;
+    [key: string]: any;
+  };
+  grievance?: IGrievance;
+}
 
 // Check if user has access to a grievance
-exports.checkGrievanceAccess = async (req, res, next) => {
+export const checkGrievanceAccess = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const grievanceId = req.params.id;
     const userId = req.user.id;
-    
+
     const grievance = await Grievance.findById(grievanceId);
-    
+
     if (!grievance) {
-      return res.status(404).json({
+      res.status(404).json({
         status: 'fail',
         message: 'Grievance not found'
       });
+      return;
     }
-    
+
     // Admin has access to all grievances
     if (req.user.role === 'admin') {
       req.grievance = grievance;
-      return next();
+      next();
+      return;
     }
-    
+
     // Check if user is the submitter of this grievance
     if (grievance.submittedBy._id.toString() !== userId) {
-      return res.status(403).json({
+      res.status(403).json({
         status: 'fail',
         message: 'You do not have permission to access this grievance'
       });
+      return;
     }
-    
+
     // Store grievance for next middleware
     req.grievance = grievance;
     next();
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -41,10 +60,13 @@ exports.checkGrievanceAccess = async (req, res, next) => {
 };
 
 // Get user's grievances
-exports.getMyGrievances = async (req, res) => {
+export const getMyGrievances = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     const grievances = await Grievance.find({ submittedBy: req.user.id });
-    
+
     res.status(200).json({
       status: 'success',
       results: grievances.length,
@@ -52,7 +74,7 @@ exports.getMyGrievances = async (req, res) => {
         grievances
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -61,20 +83,23 @@ exports.getMyGrievances = async (req, res) => {
 };
 
 // Submit a new grievance
-exports.submitGrievance = async (req, res) => {
+export const submitGrievance = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     // Add submitter to request body
     req.body.submittedBy = req.user.id;
-    
+
     const newGrievance = await Grievance.create(req.body);
-    
+
     res.status(201).json({
       status: 'success',
       data: {
         grievance: newGrievance
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -83,18 +108,21 @@ exports.submitGrievance = async (req, res) => {
 };
 
 // Get a specific grievance
-exports.getGrievance = async (req, res) => {
+export const getGrievance = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     // grievance is already available from checkGrievanceAccess middleware
     const grievance = req.grievance;
-    
+
     res.status(200).json({
       status: 'success',
       data: {
         grievance
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -105,10 +133,13 @@ exports.getGrievance = async (req, res) => {
 // ADMIN HANDLERS
 
 // Get all grievances
-exports.getAllGrievances = async (req, res) => {
+export const getAllGrievances = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const grievances = await Grievance.find();
-    
+
     res.status(200).json({
       status: 'success',
       results: grievances.length,
@@ -116,7 +147,7 @@ exports.getAllGrievances = async (req, res) => {
         grievances
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -125,37 +156,42 @@ exports.getAllGrievances = async (req, res) => {
 };
 
 // Update a grievance status
-exports.updateGrievanceStatus = async (req, res) => {
+export const updateGrievanceStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { status, assignedTo } = req.body;
-    
+
     if (!['pending', 'under-review', 'resolved', 'rejected'].includes(status)) {
-      return res.status(400).json({
+      res.status(400).json({
         status: 'fail',
         message: 'Invalid status value'
       });
+      return;
     }
-    
+
     const grievance = await Grievance.findByIdAndUpdate(
       req.params.id,
       { status, assignedTo },
       { new: true, runValidators: true }
     );
-    
+
     if (!grievance) {
-      return res.status(404).json({
+      res.status(404).json({
         status: 'fail',
         message: 'No grievance found with that ID'
       });
+      return;
     }
-    
+
     res.status(200).json({
       status: 'success',
       data: {
         grievance
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message
@@ -164,17 +200,21 @@ exports.updateGrievanceStatus = async (req, res) => {
 };
 
 // Resolve a grievance
-exports.resolveGrievance = async (req, res) => {
+export const resolveGrievance = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
   try {
     const { comment } = req.body;
-    
+
     if (!comment) {
-      return res.status(400).json({
+      res.status(400).json({
         status: 'fail',
         message: 'Resolution comment is required'
       });
+      return;
     }
-    
+
     const grievance = await Grievance.findByIdAndUpdate(
       req.params.id,
       {
@@ -182,26 +222,27 @@ exports.resolveGrievance = async (req, res) => {
         resolution: {
           comment,
           resolvedBy: req.user.id,
-          resolvedAt: Date.now()
+          resolvedAt: new Date()
         }
       },
       { new: true, runValidators: true }
     );
-    
+
     if (!grievance) {
-      return res.status(404).json({
+      res.status(404).json({
         status: 'fail',
         message: 'No grievance found with that ID'
       });
+      return;
     }
-    
+
     res.status(200).json({
       status: 'success',
       data: {
         grievance
       }
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({
       status: 'fail',
       message: err.message

@@ -25,4 +25,4 @@ router.route('/:id')
 router.post('/:id/members', houseController.addMembers);
 router.delete('/:id/members/:userId', houseController.removeMember);
 
-module.exports = router;
+export default router;

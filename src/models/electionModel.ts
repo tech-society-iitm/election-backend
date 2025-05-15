@@ -1,6 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema, Model, Query } from 'mongoose';
+import { IUser, IElection, ICandidate, IPosition } from '../../types/interfaces'; // Adjust the path as needed
 
-const electionSchema = new mongoose.Schema({
+// Create the schema
+const electionSchema = new Schema<IElection>({
   title: {
     type: String,
     required: [true, 'An election must have a title'],
@@ -21,14 +23,14 @@ const electionSchema = new mongoose.Schema({
     default: 'draft'
   },
   house: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'House',
-    required: function() { return this.type === 'house'; }
+    required: function(this: IElection) { return this.type === 'house'; }
   },
   society: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Society',
-    required: function() { return this.type === 'society'; }
+    required: function(this: IElection) { return this.type === 'society'; }
   },
   positions: [{
     title: {
@@ -38,7 +40,7 @@ const electionSchema = new mongoose.Schema({
     description: String,
     candidates: [{
       user: {
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'A candidate must be associated with a user']
       },
@@ -47,7 +49,7 @@ const electionSchema = new mongoose.Schema({
         default: false
       },
       approvedBy: {
-        type: mongoose.Schema.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
       },
       approvedAt: Date,
@@ -76,7 +78,7 @@ const electionSchema = new mongoose.Schema({
   },
   resultsReleasedAt: Date,
   createdBy: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'An election must be created by a user']
   },
@@ -88,7 +90,7 @@ const electionSchema = new mongoose.Schema({
 });
 
 // Middleware to populate references when querying
-electionSchema.pre(/^find/, function(next) {
+electionSchema.pre<Query<any, IElection>>(/^find/, function(next) {
   this.populate({
     path: 'positions.candidates.user',
     select: 'name email studentId'
@@ -96,6 +98,7 @@ electionSchema.pre(/^find/, function(next) {
   next();
 });
 
-const Election = mongoose.model('Election', electionSchema);
+// Create and export the model
+const Election: Model<IElection> = mongoose.model<IElection>('Election', electionSchema);
 
-module.exports = Election;
+export default Election;

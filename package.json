@@ -2,13 +2,16 @@
   "name": "tech-society-backend",
   "version": "1.0.0",
   "description": "Backend for a Technical Society Management System",
-  "main": "src/server.js",
+  "main": "built/src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "debug": "ndb src/server.js"
+    "build": "tsc",
+    "start": "tsc && node dist/app.js",
+    "dev": "ts-node src/server.ts",
+    "watch": "tsc -w"
   },
+
   "dependencies": {
+    "@clerk/express": "^1.4.17",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -23,7 +26,18 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "@tsconfig/node-ts": "^23.6.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.1",
+    "@types/express-rate-limit": "^5.1.3",
+    "@types/hpp": "^0.2.6",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.18",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=14.0.0"

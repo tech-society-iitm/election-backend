@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, Model, Query } from 'mongoose';
+import { IGrievance } from '../../types/interfaces';
 
-const grievanceSchema = new mongoose.Schema({
+
+// Create the schema
+const grievanceSchema = new Schema<IGrievance>({
   title: {
     type: String,
     required: [true, 'A grievance must have a title'],
@@ -12,7 +15,7 @@ const grievanceSchema = new mongoose.Schema({
     trim: true
   },
   election: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Election'
   },
   status: {
@@ -21,7 +24,7 @@ const grievanceSchema = new mongoose.Schema({
     default: 'pending'
   },
   submittedBy: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'A grievance must be submitted by a user']
   },
@@ -30,13 +33,13 @@ const grievanceSchema = new mongoose.Schema({
     default: Date.now
   },
   assignedTo: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   },
   resolution: {
     comment: String,
     resolvedBy: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User'
     },
     resolvedAt: Date
@@ -44,7 +47,7 @@ const grievanceSchema = new mongoose.Schema({
 });
 
 // Middleware to populate references when querying
-grievanceSchema.pre(/^find/, function(next) {
+grievanceSchema.pre<Query<any, IGrievance>>(/^find/, function(next) {
   this.populate({
     path: 'submittedBy',
     select: 'name email studentId'
@@ -58,6 +61,7 @@ grievanceSchema.pre(/^find/, function(next) {
   next();
 });
 
-const Grievance = mongoose.model('Grievance', grievanceSchema);
+// Create and export the model
+const Grievance: Model<IGrievance> = mongoose.model<IGrievance>('Grievance', grievanceSchema);
 
-module.exports = Grievance;
+export default Grievance;

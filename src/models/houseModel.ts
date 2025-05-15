@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema, Model } from 'mongoose';
+import { IHouse } from '../../types/interfaces';
 
-const houseSchema = new mongoose.Schema({
+
+// Create the schema
+const houseSchema = new Schema<IHouse>({
   name: {
     type: String,
     required: [true, 'House must have a name'],
@@ -17,11 +20,11 @@ const houseSchema = new mongoose.Schema({
   },
   logo: String,
   members: [{
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   }],
   secretaries: [{
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   }],
   active: {
@@ -29,7 +32,7 @@ const houseSchema = new mongoose.Schema({
     default: true
   },
   createdBy: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'A house must have a creator']
   },
@@ -40,6 +43,7 @@ const houseSchema = new mongoose.Schema({
   updatedAt: Date
 });
 
-const House = mongoose.model('House', houseSchema);
+// Create and export the model
+const House: Model<IHouse> = mongoose.model<IHouse>('House', houseSchema);
 
-module.exports = House;
+export default House;

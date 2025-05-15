@@ -13,4 +13,4 @@ router.post('/:electionId', voteController.castVote);
 // Get user's voting history
 router.get('/my', voteController.getMyVotes);
 
-module.exports = router;
+export default router;

@@ -1,23 +1,29 @@
-const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
+import express, { Request, Response, NextFunction, Application } from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+// import xss from 'xss-clean';
+import hpp from 'hpp';
 
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const societyRoutes = require('./routes/societyRoutes');
-const houseRoutes = require('./routes/houseRoutes');
-const electionRoutes = require('./routes/electionRoutes');
-const voteRoutes = require('./routes/voteRoutes');
-const resultRoutes = require('./routes/resultRoutes');
-const grievanceRoutes = require('./routes/grievanceRoutes');
-const adminAuthRoutes = require('./routes/adminAuthRoutes'); // Import adminAuthRoutes
+import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import societyRoutes from './routes/societyRoutes';
+import houseRoutes from './routes/houseRoutes';
+import electionRoutes from './routes/electionRoutes';
+import voteRoutes from './routes/voteRoutes';
+import resultRoutes from './routes/resultRoutes';
+import grievanceRoutes from './routes/grievanceRoutes';
+import adminAuthRoutes from './routes/adminAuthRoutes';
 
-const app = express();
+// Define error interface
+interface AppError extends Error {
+  statusCode?: number;
+  status?: string;
+}
+
+const app: Application = express();
 
 // GLOBAL MIDDLEWARES
 // Set security HTTP headers
@@ -51,7 +57,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 
 // Data sanitization against XSS
-app.use(xss());
+// app.use(xss());
 
 // Prevent parameter pollution
 app.use(hpp({
@@ -67,10 +73,10 @@ app.use('/api/elections', electionRoutes);
 app.use('/api/votes', voteRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/grievances', grievanceRoutes);
-app.use('/admin/auth', adminAuthRoutes); 
+app.use('/admin/auth', adminAuthRoutes);
 
 // 404 Not Found handler
-app.all('*', (req, res, next) => {
+app.all('*', (req: Request, res: Response) => {
   res.status(404).json({
     status: 'fail',
     message: `Can't find ${req.originalUrl} on this server!`
@@ -78,7 +84,7 @@ app.all('*', (req, res, next) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
@@ -88,4 +94,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-module.exports = app;
+export default app;

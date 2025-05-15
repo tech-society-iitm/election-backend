@@ -1,8 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, model, Query } from "mongoose";
 
-const voteSchema = new mongoose.Schema({
+import { IVote } from "../../types/interfaces";
+
+const voteSchema = new Schema<IVote>({
   election: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Election',
     required: [true, 'A vote must be associated with an election']
   },
@@ -11,16 +13,16 @@ const voteSchema = new mongoose.Schema({
     required: [true, 'A vote must be for a specific position']
   },
   candidate: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'A vote must be for a candidate']
   },
   voter: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'A vote must be cast by a voter']
   },
-  castAt: {
+  timestamp: {
     type: Date,
     default: Date.now
   },
@@ -35,11 +37,11 @@ const voteSchema = new mongoose.Schema({
 voteSchema.index({ election: 1, position: 1, voter: 1 }, { unique: true });
 
 // Hide voter information in query results for ballot secrecy
-voteSchema.pre(/^find/, function(next) {
+voteSchema.pre<Query<any, IVote>>(/^find/, function(next) {
   this.select('-voter -clientHash');
   next();
 });
 
-const Vote = mongoose.model('Vote', voteSchema);
+const Vote = model('Vote', voteSchema);
 
-module.exports = Vote;
+export default Vote;

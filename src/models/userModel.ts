@@ -1,7 +1,9 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose, { Schema, model, Query } from "mongoose";
+import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema({
+import { IUser } from "../../types/interfaces";
+
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
     required: [true, 'Please provide your name']
@@ -32,12 +34,12 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'house', 'society', 'user'],
     default: 'user'
   },
-  house: {
-    type: mongoose.Schema.ObjectId,
+  houseId: {
+    type: Schema.Types.ObjectId,
     ref: 'House'
   },
-  societies: [{
-    type: mongoose.Schema.ObjectId,
+  societyId: [{
+    type: Schema.Types.ObjectId,
     ref: 'Society'
   }],
   passwordChangedAt: Date,
@@ -51,6 +53,9 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  updatedAt: {
+    type: Date,
   }
 });
 
@@ -61,38 +66,38 @@ userSchema.pre('save', async function(next) {
 
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-  
+
   next();
 });
 
 // Update passwordChangedAt property
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
-  
-  this.passwordChangedAt = Date.now() - 1000; // Ensure token is created after password change
+
+  this.passwordChangedAt = new Date(Date.now() - 1000); // Ensure token is created after password change
   next();
 });
 
 // Query middleware to filter out inactive users
-userSchema.pre(/^find/, function(next) {
+userSchema.pre<Query<any, IUser>>(/^find/, function(next) {
   this.find({ active: { $ne: false } });
   next();
 });
 
 // Instance method to check if password is correct
-userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
+userSchema.methods.correctPassword = async function(candidatePassword: string, userPassword: string) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 // Instance method to check if password changed after JWT was issued
-userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp: number) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    const changedTimestamp = Math.floor(this.passwordChangedAt.getTime() / 1000);
     return JWTTimestamp < changedTimestamp;
   }
   return false;
 };
 
-const User = mongoose.model('User', userSchema);
+const User = model<IUser>('User', userSchema);
 
-module.exports = User;
+export default User;

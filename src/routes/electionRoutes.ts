@@ -15,7 +15,7 @@ router.get('/:id', electionController.getElection);
 router.post('/:id/nominate', electionController.submitNomination);
 
 // Routes restricted to admin, house, or society roles
-router.post('/', 
+router.post('/',
   authMiddleware.restrictTo('admin', 'house', 'society'),
   electionController.createElection
 );
@@ -37,4 +37,4 @@ router.post('/:id/position',
   electionController.addPosition
 );
 
-module.exports = router;
+export default router;

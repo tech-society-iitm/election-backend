@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, Model } from 'mongoose';
+import { ISociety } from '../../types/interfaces';
 
-const societySchema = new mongoose.Schema({
+
+// Create the schema
+const societySchema = new Schema<ISociety>({
   name: {
     type: String,
     required: [true, 'Society must have a name'],
@@ -19,7 +22,7 @@ const societySchema = new mongoose.Schema({
   logo: String,
   members: [{
     user: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User'
     },
     role: {
@@ -33,7 +36,7 @@ const societySchema = new mongoose.Schema({
     }
   }],
   leads: [{
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   }],
   active: {
@@ -41,7 +44,7 @@ const societySchema = new mongoose.Schema({
     default: true
   },
   createdBy: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'A society must have a creator']
   },
@@ -52,6 +55,7 @@ const societySchema = new mongoose.Schema({
   updatedAt: Date
 });
 
-const Society = mongoose.model('Society', societySchema);
+// Create and export the model
+const Society: Model<ISociety> = mongoose.model<ISociety>('Society', societySchema);
 
-module.exports = Society;
+export default Society;

@@ -10,4 +10,4 @@ router.use(authMiddleware.protect);
 // Get election results
 router.get('/:electionId', resultController.getElectionResults);
 
-module.exports = router;
+export default router;

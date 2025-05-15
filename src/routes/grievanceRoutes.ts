@@ -21,4 +21,4 @@ router.get('/', grievanceController.getAllGrievances);
 router.patch('/:id', grievanceController.updateGrievanceStatus);
 router.post('/:id/resolve', grievanceController.resolveGrievance);
 
-module.exports = router;
+export default router;

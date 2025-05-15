@@ -12,7 +12,7 @@ router.get('/', societyController.getAllSocieties);
 router.get('/:id', societyController.getSociety);
 
 // Admin only routes for creation
-router.post('/', 
+router.post('/',
   authMiddleware.restrictTo('admin'),
   societyController.createSociety
 );
@@ -39,4 +39,4 @@ router.delete('/:id/members/:userId',
   societyController.removeMember
 );
 
-module.exports = router;
+export default router;

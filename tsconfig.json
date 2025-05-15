@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "target": "ES6",
+    "strict": true,
+    "noEmitOnError": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext"
+    },
+    "include": ["./src/**/*.ts", "./types"],
+    "exclude": ["node_modules"]
+}

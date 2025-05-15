@@ -1,9 +1,16 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
+import { Request, Response, NextFunction } from 'express';
 const User = require('../models/userModel');
 
+interface AuthenticatedRequest extends Request {
+  user: {
+    role: string;
+  };
+}
+
 // Protect routes - verify user is logged in
-exports.protect = async (req, res, next) => {
+exports.protect = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     // 1) Get token from authorization header
     let token;
@@ -50,8 +57,8 @@ exports.protect = async (req, res, next) => {
 };
 
 // Restrict access to certain roles
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
+exports.restrictTo = (...roles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         status: 'fail',
@@ -63,10 +70,10 @@ exports.restrictTo = (...roles) => {
 };
 
 // Check if user is associated with a specific house
-exports.isHouseMember = async (req, res, next) => {
+exports.isHouseMember = async (req: { params: { houseId: any; }; body: { houseId: any; }; user: { role: string; house: { toString: () => any; }; }; }, res: Response, next: NextFunction) => {
   try {
     const houseId = req.params.houseId || req.body.houseId;
-    
+
     if (!houseId) {
       return res.status(400).json({
         status: 'fail',
@@ -97,10 +104,10 @@ exports.isHouseMember = async (req, res, next) => {
 };
 
 // Check if user is associated with a specific society
-exports.isSocietyMember = async (req, res, next) => {
+exports.isSocietyMember = async (req: { params: { societyId: any; }; body: { societyId: any; }; user: { role: string; societies: any[]; }; }, res: Response, next: NextFunction) => {
   try {
     const societyId = req.params.societyId || req.body.societyId;
-    
+
     if (!societyId) {
       return res.status(400).json({
         status: 'fail',
