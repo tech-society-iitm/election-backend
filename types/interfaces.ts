@@ -1,8 +1,10 @@
 import mongoose, {Document} from "mongoose";
+import { Request } from "express";
 
 // User interfaces
 export interface IUser extends Document {
   _id: string;
+  clerkId: string;
   email: string;
   name: string;
   password: string;
@@ -17,6 +19,43 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface WebhookEvent {
+  data: {
+    id: string;
+    email_addresses: Array<{
+      email_address: string;
+      id: string;
+      verification: {
+        status: string;
+        strategy: string;
+      };
+    }>;
+    first_name: string | null;
+    last_name: string | null;
+    image_url: string | null;
+    created_at: number;
+    updated_at: number;
+    [key: string]: any;
+  };
+  object: string;
+  type: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user: {
+    role: string;
+    _id?: string;
+    email?: string;
+    name?: string;
+    studentId?: string;
+    houseId?: string;
+    societyId?: string;
+    clerkId?: string; // Add Clerk ID for reference
+  };
+  clerkUser?: any; // Optional: Raw Clerk user data if needed
+}
+
 
 // Define interface for House document
 export interface IHouse extends Document {

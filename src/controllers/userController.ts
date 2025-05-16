@@ -11,58 +11,55 @@ interface AuthenticatedRequest extends Request {
 // Get current user profile
 exports.getMe = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate('house')
-      .populate('societies');
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user
-      }
-    });
-  } catch (err: any) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
+    return res.status(200).json({
+      user: req.user
+    })
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 // Update current user profile
-exports.updateMe = async (req: AuthenticatedRequest, res: Response) => {
+exports.updateMe = async (req: AuthenticatedRequest, res:Response) => {
   try {
-    // Check if user is trying to update password
-    if (req.body.password) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'This route is not for password updates. Please use /update-password.'
-      });
+    const { studentId, name } = req.body;
+
+    if (!req.user.id) {
+      return res.status(400).json({ message: 'User ID not found' });
     }
 
-    // Filter out unwanted fields that should not be updated
-    const filteredBody = filterObj(req.body, 'name', 'email');
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        ...(studentId && { studentId }),
+        ...(name && { name }),
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
 
-    // Update user document
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-      new: true,
-      runValidators: true
-    });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: updatedUser
+    return res.status(200).json({
+      user: {
+        _id: updatedUser._id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        studentId: updatedUser.studentId,
+        role: updatedUser.role,
+        houseId: updatedUser.houseId,
+        societyId: updatedUser.societyId,
+        clerkId: updatedUser.clerkId
       }
     });
-  } catch (err: any) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 // Helper function to filter object
 const filterObj = <T extends object>(obj: T, ...allowedFields: string[]) => {
   const newObj: Partial<T> = {};

@@ -4,6 +4,11 @@ import bcrypt from 'bcryptjs';
 import { IUser } from "../../types/interfaces";
 
 const userSchema = new Schema<IUser>({
+  clerkId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: [true, 'Please provide your name']
@@ -20,14 +25,13 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
     minlength: 8,
     select: false
   },
   studentId: {
     type: String,
-    required: [true, 'Please provide a student ID'],
-    unique: true
+    // required: [true, 'Please provide a student ID'],
+    // unique: true
   },
   role: {
     type: String,
@@ -65,7 +69,9 @@ userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
 
   // Hash the password with cost of 12
-  this.password = await bcrypt.hash(this.password, 12);
+  if (this.password) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
 
   next();
 });
