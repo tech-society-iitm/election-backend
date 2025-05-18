@@ -46,9 +46,6 @@ const userSchema = new Schema<IUser>({
     type: Schema.Types.ObjectId,
     ref: 'Society'
   }],
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
   active: {
     type: Boolean,
     default: true,

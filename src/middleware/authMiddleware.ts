@@ -13,7 +13,7 @@ interface VerifyTokenOptions {
 
 
 export const clerkAuthMiddleware = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -61,7 +61,8 @@ export const clerkAuthMiddleware = async (
     }
 
     // Set user in request
-    req.user = {
+    const authReq = req as AuthenticatedRequest;
+    authReq.user = {
       _id: user._id,
       role: user.role,
       email: user.email,
@@ -72,7 +73,7 @@ export const clerkAuthMiddleware = async (
       clerkId: clerkUser.id
     };
 
-    req.clerkUser = clerkUser; // Optional: Store raw Clerk user data
+    authReq.clerkUser = clerkUser; // Optional: Store raw Clerk user data
 
     next();
   } catch (error) {

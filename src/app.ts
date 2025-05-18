@@ -77,6 +77,12 @@ app.use('/api/votes', voteRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/grievances', grievanceRoutes);
 app.use('/admin/auth', adminAuthRoutes);
+app.use('/api/status', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Server is running'
+  });
+});
 
 // 404 Not Found handler
 app.all('*', (req: Request, res: Response) => {

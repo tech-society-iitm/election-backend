@@ -17,7 +17,7 @@ router.patch('/me', userController.updateMe);
 router.use(authMiddleware.restrictTo('admin'));
 router.route('/')
   .get(userController.getAllUsers)
-  .post(userController.createUser);
+  // .post(userController.createUser);
 
 router.route('/:id')
   .get(userController.getUser)

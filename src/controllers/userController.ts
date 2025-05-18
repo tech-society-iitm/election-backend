@@ -92,26 +92,26 @@ exports.getAllUsers = async (req: Request, res: Response) => {
 };
 
 // Create a new user
-exports.createUser = async (req: Request, res: Response) => {
-  try {
-    const newUser = await User.create(req.body);
+// exports.createUser = async (req: Request, res: Response) => {
+//   try {
+//     const newUser = await User.create(req.body);
 
-    // Remove password from output
-    newUser.password = undefined;
+//     // Remove password from output
+//     newUser.password = undefined;
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        user: newUser
-      }
-    });
-  } catch (err: any) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
-  }
-};
+//     res.status(201).json({
+//       status: 'success',
+//       data: {
+//         user: newUser
+//       }
+//     });
+//   } catch (err: any) {
+//     res.status(400).json({
+//       status: 'fail',
+//       message: err.message
+//     });
+//   }
+// };
 
 // Get a specific user
 exports.getUser = async (req: Request, res: Response) => {

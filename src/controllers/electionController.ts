@@ -20,7 +20,7 @@ export const checkElectionOwnership = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<any> => {
   try {
     const electionId = req.params.id;
     const userId = req.user.id;
@@ -79,7 +79,7 @@ export const checkElectionOwnership = async (
 };
 
 // Get all elections
-export const getAllElections = async (req: Request, res: Response): Promise<void> => {
+export const getAllElections = async (req: Request, res: Response): Promise<any> => {
   try {
     // Build query - filter by status if provided
     const filter: Record<string, any> = {};
@@ -127,7 +127,7 @@ export const getAllElections = async (req: Request, res: Response): Promise<void
 };
 
 // Get a specific election
-export const getElection = async (req: Request, res: Response): Promise<void> => {
+export const getElection = async (req: Request, res: Response): Promise<any> => {
   try {
     const election = await Election.findById(req.params.id)
       .populate({
@@ -166,7 +166,7 @@ export const getElection = async (req: Request, res: Response): Promise<void> =>
 };
 
 // Create a new election
-export const createElection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const createElection = async (req: AuthenticatedRequest, res: Response) => {
   try {
     // Add the creator to the request body
     req.body.createdBy = req.user.id;
@@ -228,13 +228,13 @@ export const createElection = async (req: AuthenticatedRequest, res: Response): 
   } catch (err: any) {
     res.status(400).json({
       status: 'fail',
-      message: err.message
+      message: `${err.message}`
     });
   }
 };
 
 // Submit a nomination for an election
-export const submitNomination = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const submitNomination = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
     const { position, manifesto } = req.body;
@@ -316,7 +316,7 @@ export const submitNomination = async (req: AuthenticatedRequest, res: Response)
 };
 
 // Approve a nomination
-export const approveNomination = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const approveNomination = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
     const { position, candidateId } = req.body;
@@ -385,7 +385,7 @@ export const approveNomination = async (req: AuthenticatedRequest, res: Response
 };
 
 // Update an election
-export const updateElection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const updateElection = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
   try {
     // election is already available from checkElectionOwnership middleware
     const election = req.election;
@@ -429,7 +429,7 @@ export const updateElection = async (req: AuthenticatedRequest, res: Response): 
 };
 
 // Delete an election
-export const deleteElection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const deleteElection = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
   try {
     // election is already available from checkElectionOwnership middleware
     const election = req.election;
@@ -466,7 +466,7 @@ export const deleteElection = async (req: AuthenticatedRequest, res: Response): 
 };
 
 // Add a position to an election
-export const addPosition = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const addPosition = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
   try {
     // election is already available from checkElectionOwnership middleware
     const election = req.election;
