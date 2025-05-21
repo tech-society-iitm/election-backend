@@ -16,7 +16,6 @@ import voteRoutes from './routes/voteRoutes';
 import resultRoutes from './routes/resultRoutes';
 import grievanceRoutes from './routes/grievanceRoutes';
 import adminAuthRoutes from './routes/adminAuthRoutes';
-import webhookRoutes from './routes/webhookRoutes';
 
 // Define error interface
 interface AppError extends Error {
@@ -51,7 +50,6 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
-app.use('/api/webhooks', webhookRoutes);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));

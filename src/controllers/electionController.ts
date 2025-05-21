@@ -234,7 +234,7 @@ export const createElection = async (req: AuthenticatedRequest, res: Response) =
 };
 
 // Submit a nomination for an election
-export const submitNomination = async (req: AuthenticatedRequest, res: Response): Promise<any> => {
+export const submitNomination = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { position, manifesto } = req.body;

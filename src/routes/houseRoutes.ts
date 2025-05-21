@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Protect all routes
-// router.use(authMiddleware.protect);
+router.use(authMiddleware.protect);
 
 // Routes accessible to all authenticated users
 router.get('/', houseController.getAllHouses);

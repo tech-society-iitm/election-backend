@@ -9,7 +9,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Get current user profile
-exports.getMe = async (req: AuthenticatedRequest, res: Response) => {
+export const getMe = async (req: AuthenticatedRequest, res: Response) => {
   try {
     return res.status(200).json({
       user: req.user
@@ -21,7 +21,7 @@ exports.getMe = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // Update current user profile
-exports.updateMe = async (req: AuthenticatedRequest, res:Response) => {
+export const updateMe = async (req: AuthenticatedRequest, res:Response) => {
   try {
     const { studentId, name } = req.body;
 
@@ -72,7 +72,7 @@ const filterObj = <T extends object>(obj: T, ...allowedFields: string[]) => {
 // ADMIN HANDLERS
 
 // Get all users
-exports.getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.find();
 
@@ -92,29 +92,29 @@ exports.getAllUsers = async (req: Request, res: Response) => {
 };
 
 // Create a new user
-// exports.createUser = async (req: Request, res: Response) => {
-//   try {
-//     const newUser = await User.create(req.body);
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const newUser = await User.create(req.body);
 
-//     // Remove password from output
-//     newUser.password = undefined;
+    // Remove password from output
+    newUser.password = undefined;
 
-//     res.status(201).json({
-//       status: 'success',
-//       data: {
-//         user: newUser
-//       }
-//     });
-//   } catch (err: any) {
-//     res.status(400).json({
-//       status: 'fail',
-//       message: err.message
-//     });
-//   }
-// };
+    res.status(201).json({
+      status: 'success',
+      data: {
+        user: newUser
+      }
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      status: 'fail',
+      message: err.message
+    });
+  }
+};
 
 // Get a specific user
-exports.getUser = async (req: Request, res: Response) => {
+export const getUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.params.id)
       .populate('house')
@@ -142,7 +142,7 @@ exports.getUser = async (req: Request, res: Response) => {
 };
 
 // Update a user
-exports.updateUser = async (req: Request, res:Response) => {
+export const updateUser = async (req: Request, res:Response) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -171,7 +171,7 @@ exports.updateUser = async (req: Request, res:Response) => {
 };
 
 // Delete a user
-exports.deleteUser = async (req: Request, res:Response) => {
+export const deleteUser = async (req: Request, res:Response) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
